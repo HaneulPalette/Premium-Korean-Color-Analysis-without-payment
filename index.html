@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Haneul Palette – Premium Color Analysis</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Haneul Palette</title>
+  <link rel="stylesheet" href="style.css">
 
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,27 +14,22 @@
 
   <img src="logo.png" class="logo" />
 
-  <h1>Premium Korean Color Analysis</h1>
-  <p class="subtitle">Upload one clear selfie in natural light</p>
+  <h1>Haneul Palette</h1>
+  <p class="subtitle">Premium Korean Color Analysis</p>
 
-  <input type="file" id="imageInput" accept="image/*" />
+  <input type="file" id="imageInput" accept="image/*">
 
-  <button onclick="analyzeImage()">Analyze My Face</button>
+  <button onclick="analyzeImage()">Analyze</button>
 
-  <div id="loading" class="hidden">Analyzing… please wait</div>
+  <div id="loading" class="hidden">Analyzing...</div>
 
   <div id="results" class="hidden">
-
-    <h2>Your Results</h2>
-
-    <p><b>Analysis ID:</b> <span id="analysisId"></span></p>
+    <h2>Results</h2>
+    <p><b>ID:</b> <span id="analysisId"></span></p>
 
     <div id="analysisText"></div>
 
-    <button onclick="downloadPDF()" class="downloadBtn">
-      Download Full Report (PDF)
-    </button>
-
+    <button onclick="downloadPDF()">Download PDF</button>
   </div>
 
 </div>

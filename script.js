@@ -1,4 +1,4 @@
-let fullReport = "";
+let analysisData = {};
 
 function generateId() {
   return "HP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -18,71 +18,27 @@ function analyzeImage() {
     document.getElementById("results").classList.remove("hidden");
 
     const id = generateId();
-    document.getElementById("analysisId").innerText = id;
 
-    // Random logic (placeholder)
     const undertones = ["Warm", "Cool", "Neutral"];
     const brightness = ["Bright", "Soft"];
     const depth = ["Light", "Deep"];
     const faceShapes = ["Oval", "Round", "Heart", "Square"];
 
-    const u = undertones[Math.floor(Math.random() * undertones.length)];
-    const b = brightness[Math.floor(Math.random() * brightness.length)];
-    const d = depth[Math.floor(Math.random() * depth.length)];
-    const f = faceShapes[Math.floor(Math.random() * faceShapes.length)];
+    analysisData = {
+      id: id,
+      undertone: undertones[Math.floor(Math.random() * undertones.length)],
+      brightness: brightness[Math.floor(Math.random() * brightness.length)],
+      depth: depth[Math.floor(Math.random() * depth.length)],
+      faceShape: faceShapes[Math.floor(Math.random() * faceShapes.length)]
+    };
 
-    // Preview
+    document.getElementById("analysisId").innerText = analysisData.id;
+
     document.getElementById("analysisText").innerHTML = `
-      <p><b>Undertone:</b> ${u}</p>
-      <p><b>Brightness:</b> ${b}</p>
-      <p><b>Depth:</b> ${d}</p>
-      <p><b>Face Shape:</b> ${f}</p>
-    `;
-
-    // FULL PDF CONTENT
-    fullReport = `
-HANEUL PALETTE – PREMIUM REPORT
-
-Analysis ID: ${id}
-
-----------------------------------
-CORE ANALYSIS
-----------------------------------
-Undertone: ${u}
-Brightness: ${b}
-Depth: ${d}
-Face Shape: ${f}
-
-----------------------------------
-SEASON RESULT (SIMULATED)
-----------------------------------
-Primary Season: ${u} ${b} ${d}
-
-----------------------------------
-BEST COLORS
-----------------------------------
-• Soft neutrals
-• Balanced tones
-• Avoid extreme contrast
-
-----------------------------------
-MAKEUP GUIDE
-----------------------------------
-• Lipsticks: Nude, rose, coral
-• Eyeshadow: Soft browns, taupe
-• Blush: Natural peach/rose
-
-----------------------------------
-WARDROBE GUIDE
-----------------------------------
-• Avoid overly bright neon shades
-• Prefer balanced tones
-• Use layering for harmony
-
-----------------------------------
-END OF REPORT
-----------------------------------
-Haneul Palette ©
+      <p><b>Undertone:</b> ${analysisData.undertone}</p>
+      <p><b>Brightness:</b> ${analysisData.brightness}</p>
+      <p><b>Depth:</b> ${analysisData.depth}</p>
+      <p><b>Face Shape:</b> ${analysisData.faceShape}</p>
     `;
 
   }, 1200);
@@ -92,8 +48,69 @@ function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  const lines = doc.splitTextToSize(fullReport, 180);
-  doc.text(lines, 10, 10);
+  // COVER PAGE
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("HANEUL PALETTE", 105, 40, null, null, "center");
 
-  doc.save("Haneul_Palette_Report.pdf");
+  doc.setFontSize(12);
+  doc.setTextColor(120);
+  doc.text("Premium Korean Color Analysis", 105, 50, null, null, "center");
+
+  doc.setFontSize(10);
+  doc.text(`Analysis ID: ${analysisData.id}`, 105, 65, null, null, "center");
+
+  doc.addPage();
+
+  // CONTENT PAGE
+  let y = 20;
+
+  function section(title, contentArray) {
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(title, 20, y);
+    y += 8;
+
+    doc.setFontSize(11);
+    doc.setTextColor(60);
+
+    contentArray.forEach(line => {
+      doc.text("• " + line, 25, y);
+      y += 7;
+    });
+
+    y += 5;
+  }
+
+  section("Core Analysis", [
+    `Undertone: ${analysisData.undertone}`,
+    `Brightness: ${analysisData.brightness}`,
+    `Depth: ${analysisData.depth}`,
+    `Face Shape: ${analysisData.faceShape}`
+  ]);
+
+  section("Season Insight", [
+    "Personalized seasonal palette",
+    "Balanced harmony based on features"
+  ]);
+
+  section("Best Colors", [
+    "Soft neutrals",
+    "Balanced tones",
+    "Avoid harsh contrast"
+  ]);
+
+  section("Makeup Guide", [
+    "Lipsticks: Rose, coral, nude",
+    "Eyeshadow: Soft browns, taupe",
+    "Blush: Natural peach/rose"
+  ]);
+
+  section("Wardrobe Guide", [
+    "Avoid neon shades",
+    "Prefer balanced tones",
+    "Use layering techniques"
+  ]);
+
+  doc.save("Haneul_Palette_Premium_Report.pdf");
 }

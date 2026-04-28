@@ -28,9 +28,9 @@ function analyzeImage() {
     document.getElementById("analysisId").innerText = data.id;
 
     document.getElementById("analysisText").innerHTML = `
-      Undertone: ${data.undertone}<br>
-      Brightness: ${data.brightness}<br>
-      Depth: ${data.depth}
+      <p><b>Undertone:</b> ${data.undertone}</p>
+      <p><b>Brightness:</b> ${data.brightness}</p>
+      <p><b>Depth:</b> ${data.depth}</p>
     `;
   }, 1000);
 }
@@ -39,94 +39,63 @@ function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  const pageWidth = doc.internal.pageSize.getWidth();
+  const content = `
+  <div style="font-family:Helvetica; padding:40px; background:#faf7f4;">
 
-  const img = new Image();
-  img.src = "logo.png";
+    <!-- COVER -->
+    <div style="text-align:center; margin-top:80px;">
+      <img src="logo.png" style="width:80px; margin-bottom:20px;" />
+      <h1 style="letter-spacing:2px;">HANEUL PALETTE</h1>
+      <p style="color:#888;">Premium Korean Color Analysis</p>
+      <p style="margin-top:20px;">Analysis ID: ${data.id}</p>
+    </div>
 
-  img.onload = function () {
+    <div style="page-break-after: always;"></div>
 
-    // ===== COVER PAGE =====
-    doc.setFillColor(250, 247, 244);
-    doc.rect(0, 0, pageWidth, 297, "F");
+    <!-- CONTENT -->
+    <h2 style="border-bottom:1px solid #ddd;">Core Analysis</h2>
+    <p><b>Undertone:</b> ${data.undertone}</p>
+    <p><b>Brightness:</b> ${data.brightness}</p>
+    <p><b>Depth:</b> ${data.depth}</p>
 
-    doc.addImage(img, "PNG", pageWidth/2 - 20, 40, 40, 40);
+    <h2 style="margin-top:25px; border-bottom:1px solid #ddd;">Season Insight</h2>
+    <p>Balanced Korean seasonal harmony.</p>
 
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(24);
-    doc.setTextColor(60, 60, 60);
-    doc.text("HANEUL PALETTE", pageWidth / 2, 100, null, null, "center");
+    <h2 style="margin-top:25px; border-bottom:1px solid #ddd;">Best Colors</h2>
+    <ul>
+      <li>Soft neutrals</li>
+      <li>Muted tones</li>
+      <li>Low contrast palette</li>
+    </ul>
 
-    doc.setFontSize(12);
-    doc.setTextColor(120);
-    doc.text("Premium Korean Color Analysis", pageWidth / 2, 110, null, null, "center");
+    <h2 style="margin-top:25px; border-bottom:1px solid #ddd;">Makeup Guide</h2>
+    <ul>
+      <li>MLBB lip shades</li>
+      <li>Soft brown eyeshadows</li>
+      <li>Natural blush tones</li>
+    </ul>
 
-    doc.setFontSize(10);
-    doc.text(`Analysis ID: ${data.id}`, pageWidth / 2, 125, null, null, "center");
+    <h2 style="margin-top:25px; border-bottom:1px solid #ddd;">Wardrobe Guide</h2>
+    <ul>
+      <li>Minimal styling</li>
+      <li>Neutral layering</li>
+      <li>Soft fabrics</li>
+    </ul>
 
-    doc.addPage();
+    <p style="text-align:center; margin-top:40px; font-size:12px; color:#aaa;">
+      Haneul Palette © Premium Report
+    </p>
 
-    // ===== CONTENT =====
-    let y = 20;
+  </div>
+  `;
 
-    function section(title, lines) {
-      doc.setFillColor(245, 240, 235);
-      doc.rect(15, y - 6, 180, 8, "F");
-
-      doc.setFontSize(13);
-      doc.setTextColor(80);
-      doc.text(title, 20, y);
-
-      y += 8;
-
-      doc.setFontSize(11);
-      doc.setTextColor(50);
-
-      lines.forEach(line => {
-        doc.text(line, 20, y);
-        y += 7;
-      });
-
-      y += 6;
-    }
-
-    section("Core Analysis", [
-      `Undertone: ${data.undertone}`,
-      `Brightness: ${data.brightness}`,
-      `Depth: ${data.depth}`
-    ]);
-
-    section("Season Insight", [
-      "Balanced seasonal harmony",
-      "Soft Korean palette mapping"
-    ]);
-
-    section("Best Colors", [
-      "Muted neutrals",
-      "Soft tones",
-      "Avoid harsh contrast"
-    ]);
-
-    section("Makeup Guide", [
-      "Lip: MLBB shades",
-      "Eyes: Soft browns",
-      "Blush: Natural peach"
-    ]);
-
-    section("Wardrobe Guide", [
-      "Minimal styling",
-      "Layered neutrals",
-      "Soft fabrics"
-    ]);
-
-    doc.setFontSize(9);
-    doc.setTextColor(150);
-    doc.text("Haneul Palette © Premium Report", pageWidth / 2, 285, null, null, "center");
-
-    doc.save("Haneul_Palette_Luxury_Report.pdf");
-  };
-
-  img.onerror = function () {
-    alert("Logo not found. Make sure logo.png is uploaded.");
-  };
+  doc.html(content, {
+    callback: function (doc) {
+      doc.save("Haneul_Palette_Luxury_Report.pdf");
+    },
+    x: 10,
+    y: 10,
+    width: 180,
+    windowWidth: 800
+  });
 }

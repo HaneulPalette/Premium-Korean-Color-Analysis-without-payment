@@ -1,4 +1,4 @@
-let analysisData = {};
+let data = {};
 
 function generateId() {
   return "HP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -6,8 +6,9 @@ function generateId() {
 
 function analyzeImage() {
   const input = document.getElementById("imageInput");
+
   if (!input.files.length) {
-    alert("Please upload an image");
+    alert("Upload image");
     return;
   }
 
@@ -17,100 +18,115 @@ function analyzeImage() {
     document.getElementById("loading").classList.add("hidden");
     document.getElementById("results").classList.remove("hidden");
 
-    const id = generateId();
-
-    const undertones = ["Warm", "Cool", "Neutral"];
-    const brightness = ["Bright", "Soft"];
-    const depth = ["Light", "Deep"];
-    const faceShapes = ["Oval", "Round", "Heart", "Square"];
-
-    analysisData = {
-      id: id,
-      undertone: undertones[Math.floor(Math.random() * undertones.length)],
-      brightness: brightness[Math.floor(Math.random() * brightness.length)],
-      depth: depth[Math.floor(Math.random() * depth.length)],
-      faceShape: faceShapes[Math.floor(Math.random() * faceShapes.length)]
+    data = {
+      id: generateId(),
+      undertone: ["Warm", "Cool", "Neutral"][Math.floor(Math.random()*3)],
+      brightness: ["Soft", "Bright"][Math.floor(Math.random()*2)],
+      depth: ["Light", "Deep"][Math.floor(Math.random()*2)]
     };
 
-    document.getElementById("analysisId").innerText = analysisData.id;
+    document.getElementById("analysisId").innerText = data.id;
 
     document.getElementById("analysisText").innerHTML = `
-      <p><b>Undertone:</b> ${analysisData.undertone}</p>
-      <p><b>Brightness:</b> ${analysisData.brightness}</p>
-      <p><b>Depth:</b> ${analysisData.depth}</p>
-      <p><b>Face Shape:</b> ${analysisData.faceShape}</p>
+      Undertone: ${data.undertone}<br>
+      Brightness: ${data.brightness}<br>
+      Depth: ${data.depth}
     `;
-
-  }, 1200);
+  }, 1000);
 }
 
 function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  // COVER PAGE
-  doc.setFont("Helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("HANEUL PALETTE", 105, 40, null, null, "center");
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-  doc.setFontSize(12);
-  doc.setTextColor(120);
-  doc.text("Premium Korean Color Analysis", 105, 50, null, null, "center");
+  const img = new Image();
+  img.src = "logo.png";
 
-  doc.setFontSize(10);
-  doc.text(`Analysis ID: ${analysisData.id}`, 105, 65, null, null, "center");
+  img.onload = function () {
 
-  doc.addPage();
+    // ===== COVER PAGE =====
+    doc.setFillColor(250, 247, 244);
+    doc.rect(0, 0, pageWidth, 297, "F");
 
-  // CONTENT PAGE
-  let y = 20;
+    doc.addImage(img, "PNG", pageWidth/2 - 20, 40, 40, 40);
 
-  function section(title, contentArray) {
-    doc.setFontSize(14);
-    doc.setTextColor(0);
-    doc.text(title, 20, y);
-    y += 8;
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(24);
+    doc.setTextColor(60, 60, 60);
+    doc.text("HANEUL PALETTE", pageWidth / 2, 100, null, null, "center");
 
-    doc.setFontSize(11);
-    doc.setTextColor(60);
+    doc.setFontSize(12);
+    doc.setTextColor(120);
+    doc.text("Premium Korean Color Analysis", pageWidth / 2, 110, null, null, "center");
 
-    contentArray.forEach(line => {
-      doc.text("• " + line, 25, y);
-      y += 7;
-    });
+    doc.setFontSize(10);
+    doc.text(`Analysis ID: ${data.id}`, pageWidth / 2, 125, null, null, "center");
 
-    y += 5;
-  }
+    doc.addPage();
 
-  section("Core Analysis", [
-    `Undertone: ${analysisData.undertone}`,
-    `Brightness: ${analysisData.brightness}`,
-    `Depth: ${analysisData.depth}`,
-    `Face Shape: ${analysisData.faceShape}`
-  ]);
+    // ===== CONTENT =====
+    let y = 20;
 
-  section("Season Insight", [
-    "Personalized seasonal palette",
-    "Balanced harmony based on features"
-  ]);
+    function section(title, lines) {
+      doc.setFillColor(245, 240, 235);
+      doc.rect(15, y - 6, 180, 8, "F");
 
-  section("Best Colors", [
-    "Soft neutrals",
-    "Balanced tones",
-    "Avoid harsh contrast"
-  ]);
+      doc.setFontSize(13);
+      doc.setTextColor(80);
+      doc.text(title, 20, y);
 
-  section("Makeup Guide", [
-    "Lipsticks: Rose, coral, nude",
-    "Eyeshadow: Soft browns, taupe",
-    "Blush: Natural peach/rose"
-  ]);
+      y += 8;
 
-  section("Wardrobe Guide", [
-    "Avoid neon shades",
-    "Prefer balanced tones",
-    "Use layering techniques"
-  ]);
+      doc.setFontSize(11);
+      doc.setTextColor(50);
 
-  doc.save("Haneul_Palette_Premium_Report.pdf");
+      lines.forEach(line => {
+        doc.text(line, 20, y);
+        y += 7;
+      });
+
+      y += 6;
+    }
+
+    section("Core Analysis", [
+      `Undertone: ${data.undertone}`,
+      `Brightness: ${data.brightness}`,
+      `Depth: ${data.depth}`
+    ]);
+
+    section("Season Insight", [
+      "Balanced seasonal harmony",
+      "Soft Korean palette mapping"
+    ]);
+
+    section("Best Colors", [
+      "Muted neutrals",
+      "Soft tones",
+      "Avoid harsh contrast"
+    ]);
+
+    section("Makeup Guide", [
+      "Lip: MLBB shades",
+      "Eyes: Soft browns",
+      "Blush: Natural peach"
+    ]);
+
+    section("Wardrobe Guide", [
+      "Minimal styling",
+      "Layered neutrals",
+      "Soft fabrics"
+    ]);
+
+    doc.setFontSize(9);
+    doc.setTextColor(150);
+    doc.text("Haneul Palette © Premium Report", pageWidth / 2, 285, null, null, "center");
+
+    doc.save("Haneul_Palette_Luxury_Report.pdf");
+  };
+
+  img.onerror = function () {
+    alert("Logo not found. Make sure logo.png is uploaded.");
+  };
 }
